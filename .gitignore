@@ -1,0 +1,23 @@
+# Diese .gitignore arbeitet als Whitelist:
+# Zuerst wird ALLES in diesem Ordner ignoriert …
+/*
+
+# … dann werden nur die Programmdateien wieder freigegeben.
+!/.gitignore
+!/README.md
+!/LICENSE
+!/requirements.txt
+!/screening.py
+!/Screening starten.command
+
+# Aus dem Beispielordner nur die erfundenen Testdaten und die Kriterien-Vorlage
+!/Beispiel/
+/Beispiel/*
+!/Beispiel/beispiel_treffer.csv
+!/Beispiel/kriterien_beispiel.toml
+
+# macOS-Systemdateien nie hochladen
+.DS_Store
+
+# Alles andere bleibt automatisch lokal: Rechercheexporte, eigene Kriterien-Dateien,
+# Testordner – auch solche, die erst später dazukommen.

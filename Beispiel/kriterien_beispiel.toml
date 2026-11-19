@@ -1,0 +1,117 @@
+# Beispiel-Kriterien passend zu Beispiel/beispiel_treffer.csv.
+# Für eine eigene Recherche: diese Datei als kriterien.toml in den Hauptordner
+# kopieren und anpassen.
+#
+# =============================================================================
+#  Ein- und Ausschlusskriterien für screening.py
+#  → Diese Datei an deine Recherche anpassen!
+# =============================================================================
+#
+#  So funktioniert's
+#  -----------------
+#  • Jeder Block [[kriterium]] ist EINE Bedingung.
+#  • Ein Treffer wird EINGESCHLOSSEN, wenn er ALLE Bedingungen erfüllt.
+#    Verletzt er auch nur eine, wird er AUSGESCHLOSSEN.
+#  • Nicht benötigte Blöcke löschen oder mit # auskommentieren.
+#  • Groß-/Kleinschreibung spielt keine Rolle.
+#  • Platzhalter *  →  "child*" passt auf child, children, childhood …
+#
+#  Angaben je Kriterium
+#  --------------------
+#    name      frei wählbar; steht in der Begründung, z. B. „Sprache Englisch/Deutsch (Wert: Spanish)“
+#    typ       eine der Prüfarten unten
+#    spalten   Spaltenüberschriften aus deiner Datei, die geprüft werden.
+#              Mehrere Varianten sind erlaubt (Scopus, Web of Science, PubMed, Rayyan …):
+#              verwendet werden alle, die es in deiner Datei gibt.
+#              • Groß-/Kleinschreibung, Leerzeichen und Unterstriche sind egal
+#                ("Author Keywords" = "author_keywords").
+#              • Gängige andere Namen erkennt das Skript selbst, z. B. "keywords"
+#                statt "Author Keywords" oder "Article Title" statt "Title".
+#              • Passt gar keine Spalte, wird das Kriterium einfach übersprungen.
+#                Welche Spalte wofür verwendet wurde, zeigen Terminal und
+#                Zusammenfassung.
+#
+#  Prüfarten (typ)
+#  ---------------
+#    "erlaubte_werte"   Wert muss einer der  werte  sein            z. B. Sprache
+#    "verbotene_werte"  Wert darf keiner der  werte  sein           z. B. Dokumenttyp
+#    "zahlenbereich"    Zahl muss zwischen  min  und  max  liegen   z. B. Jahr
+#    "enthaelt"         Text muss einen der  begriffe  enthalten    z. B. Thema
+#                       (mit  modus = "alle"  müssen alle Begriffe vorkommen)
+#    "enthaelt_nicht"   Text darf keinen der  begriffe  enthalten   z. B. Tierstudien
+#    "nicht_leer"       Feld muss ausgefüllt sein                   z. B. Abstract
+#
+#  Wenn eine Angabe fehlt (optional, gilt je Kriterium)
+#  ----------------------------------------------------
+#    wenn_leer = "einschliessen"   Standard: Treffer bleibt drin, wird aber GELB
+#                                  markiert, damit du ihn von Hand prüfst
+#    wenn_leer = "ausschliessen"   Treffer ohne Angabe wird ausgeschlossen
+#    wenn_leer = "ignorieren"      Treffer ohne Angabe bleibt drin, ganz normal grün
+#                                  (sinnvoll, wenn die Angabe oft fehlt, z. B. Sprache)
+#
+#  Gut zu wissen
+#  -------------
+#  • Zellen mit mehreren Werten wie "English; Chinese" werden einzeln geprüft;
+#    bei erlaubte_werte reicht es, wenn einer davon erlaubt ist.
+#  • UND / ODER: Begriffe innerhalb eines Blocks sind ODER-verknüpft,
+#    mehrere Blöcke sind UND-verknüpft.
+#    Beispiel "(depress* ODER anxiety) UND (adolescen* ODER youth)"
+#    → zwei enthaelt-Blöcke.
+# =============================================================================
+
+
+# --- Duplikate ---------------------------------------------------------------
+# Treffer mit gleicher DOI oder gleichem Titel wie ein Treffer weiter oben
+# werden als "Duplikat von Zeile X" ausgeschlossen. Ausschalten: entfernen = false
+[duplikate]
+entfernen = true
+spalten   = ["DOI", "DI", "Title", "Article Title", "TI", "Titel"]
+
+
+# --- Sprache: nur Englisch oder Deutsch --------------------------------------
+[[kriterium]]
+name      = "Sprache Englisch/Deutsch"
+typ       = "erlaubte_werte"
+spalten   = ["Language of Original Document", "Language", "LA", "Sprache"]
+werte     = ["English", "German", "Englisch", "Deutsch", "eng", "ger", "deu", "en", "de"]
+
+
+# --- Erscheinungsjahr --------------------------------------------------------
+[[kriterium]]
+name    = "Erscheinungsjahr 2010–2026"
+typ     = "zahlenbereich"
+spalten = ["Year", "Publication Year", "PY", "Jahr", "Erscheinungsjahr"]
+min     = 2010
+max     = 2026
+
+
+# --- Dokumenttyp -------------------------------------------------------------
+[[kriterium]]
+name    = "Dokumenttyp"
+typ     = "verbotene_werte"
+spalten = ["Document Type", "Publication Type", "DT", "Dokumenttyp"]
+werte   = ["Conference Paper", "Proceedings Paper", "Erratum", "Correction",
+           "Letter", "Editorial", "Note", "Retracted*"]
+
+
+# --- Thema: Titel, Abstract oder Keywords müssen einen der Begriffe enthalten --
+[[kriterium]]
+name     = "Thema"
+typ      = "enthaelt"
+spalten  = ["Title", "Article Title", "TI", "Abstract", "AB", "Author Keywords", "DE"]
+begriffe = ["depress*", "mental health", "psychische Gesundheit"]
+
+# --- Tierstudien ausschließen -----------------------------------------------
+[[kriterium]]
+name     = "Tierstudie"
+typ      = "enthaelt_nicht"
+spalten  = ["Title", "Article Title", "TI", "Abstract", "AB"]
+begriffe = ["mice", "mouse", "rat", "rats", "rodent*"]
+
+
+# --- Weitere Beispiele: zum Benutzen die # am Zeilenanfang entfernen ----------
+
+# [[kriterium]]
+# name    = "Abstract vorhanden"
+# typ     = "nicht_leer"
+# spalten = ["Abstract", "AB"]
